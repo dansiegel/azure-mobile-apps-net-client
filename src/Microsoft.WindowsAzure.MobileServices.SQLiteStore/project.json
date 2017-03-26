@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "Newtonsoft.Json": "10.0.1",
+    "SQLitePCLRaw.bundle_green": "1.1.2",
+    "SQLitePCLRaw.core": "1.1.2",
+    "NETStandard.Library": "1.6.0",
+    "Microsoft.NETCore.Portable.Compatibility": "1.0.1"
+  },
+  "frameworks": {
+    "netstandard1.6": {}
+  }
+}
