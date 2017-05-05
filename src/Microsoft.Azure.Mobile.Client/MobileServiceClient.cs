@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -239,6 +240,31 @@ namespace Microsoft.WindowsAzure.MobileServices
             this.Serializer = new MobileServiceSerializer();
             this.EventManager = new MobileServiceEventManager();
             this.SyncContext = new MobileServiceSyncContext(this);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the MobileServiceClient class.
+        /// </summary>
+        /// <param name="options">
+        /// <see cref="IAuthenticatedClientOptions" /> to be used for clients using Authentication
+        /// </param>
+        public MobileServiceClient(IAuthenticatedClientOptions options)
+            : this(new Uri(options.MobileAppUri, UriKind.Absolute), null)
+        {
+            Uri authenticationUri = null;
+            if(!string.IsNullOrWhiteSpace(options.AlternateAuthenticationUri) &&
+                Uri.TryCreate(options.AlternateAuthenticationUri, UriKind.Absolute, out authenticationUri))
+            {
+                // Trailing slash in the MobileAppUri is important. Fix it right here before we pass it on further.
+                this.AlternateLoginHost = new Uri(MobileServiceUrlBuilder.AddTrailingSlash(authenticationUri.AbsoluteUri), UriKind.Absolute);
+            }
+            this.LoginUriPrefix = options.LoginUriPrefix;
+
+            var handlers = options.GetDefaultMessageHandlers(this) ?? EmptyHttpMessageHandlers;
+            if(handlers.Any())
+            {
+                this.HttpClient = new MobileServiceHttpClient(handlers, this.MobileAppUri, this.InstallationId); 
+            }
         }
 
         /// <summary>
